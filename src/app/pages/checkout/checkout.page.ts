@@ -46,22 +46,24 @@ export class CheckoutPage implements OnInit {
   }
 
   placeOrder() {
+    if (this.isProcessing) return;
     this.isProcessing = true;
     
-    setTimeout(() => {
-      this.orderService.placeOrder(this.tableNumber, this.cartItems, this.total).subscribe({
-        next: (order) => {
-          this.cartService.clearCart();
-          this.isProcessing = false;
-          this.navCtrl.navigateRoot(['/order-tracking']);
-        },
-        error: (err) => {
-          console.error("Order failed to place!", err);
-          this.isProcessing = false;
-          alert("Failed to place order: " + err.message);
-        }
-      });
-    }, 2000);
+    // Place order and navigate ONLY after the server confirms the order
+    // Do NOT use setTimeout — navigating before the order is saved causes "No Active Orders"
+    this.orderService.placeOrder(this.tableNumber, this.cartItems, this.total).subscribe({
+      next: (order) => {
+        this.cartService.clearCart();
+        this.isProcessing = false;
+        // Order is now saved in service + localStorage — navigate safely
+        this.navCtrl.navigateRoot(['/order-tracking']);
+      },
+      error: (err) => {
+        console.error("Order failed to place!", err);
+        this.isProcessing = false;
+        alert("Failed to place order: " + err.message);
+      }
+    });
   }
 
   goBack() {
