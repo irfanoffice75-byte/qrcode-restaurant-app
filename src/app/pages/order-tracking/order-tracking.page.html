@@ -29,8 +29,13 @@
     </ion-button>
   </div>
 
-  <!-- Empty State (No Active Orders) -->
-  <div class="empty-state-container" *ngIf="activeOrders.length === 0 && !orderPaid" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 70vh; padding: 20px; text-align: center;">
+  <!-- Loading spinner while waiting for first data -->
+  <div *ngIf="isInitializing" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 70vh;">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+
+  <!-- Empty State (No Active Orders) — only shown AFTER data has loaded -->
+  <div class="empty-state-container" *ngIf="!isInitializing && activeOrders.length === 0 && !orderPaid" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 70vh; padding: 20px; text-align: center;">
     <ion-icon name="document-text-outline" style="font-size: 80px; color: #ccc; margin-bottom: 20px;"></ion-icon>
     <h2 style="margin: 0; color: var(--ion-color-dark);">No Active Orders</h2>
     <p style="color: var(--ion-color-medium); margin-top: 10px; margin-bottom: 30px;">You don't have any orders in progress right now.</p>

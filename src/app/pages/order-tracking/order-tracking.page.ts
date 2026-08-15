@@ -16,6 +16,7 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
 
   // Only active (non-paid, non-completed) orders shown by default
   activeOrders: Order[] = [];
+  isInitializing = true;  // true until first data arrives — prevents empty state flash
   orderPaid = false;  // True when admin marks order as paid
   private ordersSub!: Subscription;
 
@@ -43,6 +44,9 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.ordersSub = this.orderService.myOrders$.subscribe(orders => {
+      // First emission received — no longer initializing
+      this.isInitializing = false;
+
       // Only keep active orders in the main view
       this.activeOrders = orders.filter(
         o => o.status !== 'Paid' && o.status !== 'Completed'

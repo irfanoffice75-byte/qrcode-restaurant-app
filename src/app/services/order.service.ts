@@ -59,8 +59,10 @@ export class OrderService {
 
     this.socket.on('order_updated', (order: Order) => {
       this.ngZone.run(() => {
-        // Prevent socket events from overriding our optimistic UI during active API calls
-        if (this.updatingOrderIds.has(order.id)) {
+        // Block socket if we have a NEWER local update in-flight for this order
+        const lastLocalUpdate = this.recentLocalUpdates.get(order.id) || 0;
+        const isRecentlyUpdated = (Date.now() - lastLocalUpdate) < 5000;
+        if (this.updatingOrderIds.has(order.id) || isRecentlyUpdated) {
           return;
         }
 
@@ -133,21 +135,30 @@ export class OrderService {
         const active = updatedOrders.filter(o => o.status !== 'Paid' && o.status !== 'Completed');
         this.allOrders.next(active);
 
-        const currentUserId = this.authService.getCurrentUserId();
-        if (currentUserId) {
-          const myActive = active.filter(o => o.customerId === currentUserId);
-          this.myOrders.next(myActive);
-        }
-
         // Restore currentOrder from localStorage if it's still active
         const savedOrderId = localStorage.getItem('qr_current_order_id');
         if (savedOrderId) {
           const found = active.find(o => o.id === savedOrderId);
           if (found) {
             this.currentOrder.next(found);
+            // Always keep myOrders in sync with the saved order
+            const currentMyOrders = this.myOrders.getValue();
+            const alreadyInMyOrders = currentMyOrders.some(o => o.id === found.id);
+            if (!alreadyInMyOrders) {
+              this.myOrders.next([found, ...currentMyOrders]);
+            } else {
+              this.myOrders.next(currentMyOrders.map(o => o.id === found.id ? found : o));
+            }
           } else {
             localStorage.removeItem('qr_current_order_id');
             this.currentOrder.next(null);
+          }
+        } else {
+          // No saved order → fall back to filtering by userId
+          const currentUserId = this.authService.getCurrentUserId();
+          if (currentUserId) {
+            const myActive = active.filter(o => o.customerId === currentUserId);
+            this.myOrders.next(myActive);
           }
         }
 
