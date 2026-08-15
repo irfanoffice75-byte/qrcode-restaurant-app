@@ -49,6 +49,12 @@ export class RestaurantHomePage implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    const activeOrderId = localStorage.getItem('qr_current_order_id');
+    if (activeOrderId) {
+      this.router.navigate(['/order-tracking'], { replaceUrl: true });
+      return;
+    }
+
     this.tableNumber = localStorage.getItem('qr_table_no') || '';
     this.restaurantName = localStorage.getItem('qr_restaurant_name') || 'The Grand Kitchen';
 

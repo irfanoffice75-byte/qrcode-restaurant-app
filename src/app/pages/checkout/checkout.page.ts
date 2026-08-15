@@ -30,6 +30,12 @@ export class CheckoutPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    const activeOrderId = localStorage.getItem('qr_current_order_id');
+    if (activeOrderId) {
+      this.router.navigate(['/order-tracking'], { replaceUrl: true });
+      return;
+    }
+
     this.cartItems = this.cartService.getCartItems();
     this.subtotal = this.cartService.getTotalPrice();
 
@@ -37,7 +43,7 @@ export class CheckoutPage implements OnInit {
     this.tableNumber = localStorage.getItem('qr_table_no') || '';
 
     if (this.cartItems.length === 0) {
-      this.router.navigate(['/restaurant-home']);
+      this.router.navigate(['/restaurant-home'], { replaceUrl: true });
     }
   }
 
