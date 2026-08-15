@@ -41,6 +41,8 @@ export class OrderService {
 
   public newOrderReceived$ = new Subject<Order>();
   public customerNotification$ = new Subject<{header: string, message: string, color: string}>();
+  
+  public initialLoadComplete = new BehaviorSubject<boolean>(false);
 
   constructor() {
     this.socket = io(environment.socketUrl);

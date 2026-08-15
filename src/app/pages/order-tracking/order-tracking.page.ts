@@ -44,8 +44,6 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     // ── Synchronous pre-check to prevent empty-state flash ──────────────
-    // BehaviorSubject fires [] immediately on subscribe. We must decide
-    // BEFORE subscribing whether to show a spinner or jump straight to data.
     const currentOrders = this.orderService.getMyOrders();
     if (currentOrders.length > 0) {
       // Orders already in memory — render immediately, no flicker
@@ -54,8 +52,8 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
       );
       this.isInitializing = false;
     } else {
-      // Keep spinner only if localStorage says we expect an active order
-      this.isInitializing = !!localStorage.getItem('qr_current_order_id');
+      // Always start with spinner ON if no data in memory
+      this.isInitializing = true;
     }
 
     this.ordersSub = this.orderService.myOrders$.subscribe(orders => {
@@ -63,10 +61,8 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
         o => o.status !== 'Paid' && o.status !== 'Completed'
       );
 
-      // Stop spinner when:
-      // 1. Active orders have arrived, OR
-      // 2. localStorage confirms no order is expected (savedOrderId was cleared)
-      if (this.activeOrders.length > 0 || !localStorage.getItem('qr_current_order_id')) {
+      // If active orders arrive, turn off spinner immediately
+      if (this.activeOrders.length > 0) {
         this.isInitializing = false;
       }
 
@@ -78,6 +74,14 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
         this.isInitializing = false;
       }
       this.cdr.detectChanges();
+    });
+
+    // Only turn off the spinner for an empty state AFTER the initial backend load is complete
+    this.orderService.initialLoadComplete.subscribe(isComplete => {
+      if (isComplete && this.activeOrders.length === 0) {
+        this.isInitializing = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
