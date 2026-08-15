@@ -43,23 +43,39 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.ordersSub = this.orderService.myOrders$.subscribe(orders => {
-      // First emission received — no longer initializing
+    // ── Synchronous pre-check to prevent empty-state flash ──────────────
+    // BehaviorSubject fires [] immediately on subscribe. We must decide
+    // BEFORE subscribing whether to show a spinner or jump straight to data.
+    const currentOrders = this.orderService.getMyOrders();
+    if (currentOrders.length > 0) {
+      // Orders already in memory — render immediately, no flicker
+      this.activeOrders = currentOrders.filter(
+        o => o.status !== 'Paid' && o.status !== 'Completed'
+      );
       this.isInitializing = false;
+    } else {
+      // Keep spinner only if localStorage says we expect an active order
+      this.isInitializing = !!localStorage.getItem('qr_current_order_id');
+    }
 
-      // Only keep active orders in the main view
+    this.ordersSub = this.orderService.myOrders$.subscribe(orders => {
       this.activeOrders = orders.filter(
         o => o.status !== 'Paid' && o.status !== 'Completed'
       );
 
-      // If we HAD active orders before and now they are all gone →
-      // admin marked the order as Paid (deleted from 'unpaid').
-      // Show the paid success screen instead of redirecting silently.
+      // Stop spinner when:
+      // 1. Active orders have arrived, OR
+      // 2. localStorage confirms no order is expected (savedOrderId was cleared)
+      if (this.activeOrders.length > 0 || !localStorage.getItem('qr_current_order_id')) {
+        this.isInitializing = false;
+      }
+
+      // If we had active orders before and now all are paid/completed → show paid screen
       if (orders.length === 0 && !this.orderPaid) {
-        // Do nothing, let the empty state UI show up
+        // Do nothing — let empty state show only when isInitializing is false
       } else if (this.activeOrders.length === 0 && orders.length > 0) {
-        // Orders exist but all are Paid/Completed → show paid screen
         this.orderPaid = true;
+        this.isInitializing = false;
       }
       this.cdr.detectChanges();
     });
