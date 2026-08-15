@@ -1,0 +1,45 @@
+<ion-content>
+  <div class="success-container" *ngIf="order">
+    
+    <div class="animation-container">
+      <div class="circle">
+        <ion-icon name="checkmark-outline"></ion-icon>
+      </div>
+    </div>
+    
+    <h1 class="success-title">Order Placed!</h1>
+    <p class="success-message">Your order has been sent to the kitchen.</p>
+    
+    <div class="order-card">
+      <div class="order-header">
+        <span class="label">Order ID</span>
+        <span class="value">#{{ order.id }}</span>
+      </div>
+      <div class="divider"></div>
+      <div class="order-details">
+        <div class="detail-row">
+          <span class="label">Table</span>
+          <span class="value">{{ order.tableNumber }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Items</span>
+          <span class="value">{{ order.items.length }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Total Paid</span>
+          <span class="value amount">${{ order.totalPrice | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="action-buttons">
+      <ion-button expand="block" shape="round" class="track-btn" (click)="trackOrder()">
+        Track My Order
+      </ion-button>
+      
+      <ion-button expand="block" shape="round" fill="outline" color="danger" style="margin-top: 12px;" (click)="addMoreFood()">
+        Add More Items
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

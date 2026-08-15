@@ -1,0 +1,96 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="transparent">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" color="dark">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">My Cart</ion-title>
+    <ion-buttons slot="end">
+      <!-- Empty button for alignment -->
+      <ion-button disabled>
+        <ion-icon name="ellipsis-vertical" style="opacity: 0;"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="cart-container">
+    
+    <div class="empty-state" *ngIf="cartItems.length === 0">
+      <img src="assets/empty-cart.png" alt="Empty Cart" onerror="this.src='https://cdn-icons-png.flaticon.com/512/11329/11329060.png'" class="empty-img">
+      <h2>Your cart is empty</h2>
+      <p>Looks like you haven't added anything to your cart yet.</p>
+      <ion-button expand="block" shape="round" class="start-btn" (click)="goBack()">
+        Browse Menu
+      </ion-button>
+    </div>
+
+    <div class="cart-items" *ngIf="cartItems.length > 0">
+      <div class="cart-item-card" *ngFor="let item of cartItems">
+        <div class="item-image">
+          <img [src]="item.menuItem.imageUrl" [alt]="item.menuItem.name">
+        </div>
+        
+        <div class="item-details">
+          <div class="title-row">
+            <h3 class="item-name">{{ item.menuItem.name }}</h3>
+            <button class="remove-btn" (click)="removeItem(item)">
+              <ion-icon name="close-outline"></ion-icon>
+            </button>
+          </div>
+          
+          <div class="price-row">
+            <span class="item-price">${{ item.menuItem.price | number:'1.2-2' }}</span>
+            
+            <div class="quantity-selector">
+              <button class="qty-btn" (click)="decreaseQuantity(item)">
+                <ion-icon name="remove"></ion-icon>
+              </button>
+              <span class="qty-value">{{ item.quantity }}</span>
+              <button class="qty-btn" (click)="increaseQuantity(item)">
+                <ion-icon name="add"></ion-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="instructions" *ngIf="item.specialInstructions">
+            <ion-icon name="document-text-outline"></ion-icon>
+            <span>{{ item.specialInstructions }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="add-more-container" *ngIf="cartItems.length > 0">
+      <ion-button fill="clear" color="danger" (click)="goBack()">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Add More Items
+      </ion-button>
+    </div>
+
+    <!-- Spacer for bottom bar -->
+    <div class="bottom-spacer" *ngIf="cartItems.length > 0"></div>
+  </div>
+
+  <div class="checkout-bar" *ngIf="cartItems.length > 0">
+    <div class="summary-row">
+      <span class="summary-label">Subtotal</span>
+      <span class="summary-value">${{ totalPrice | number:'1.2-2' }}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">Taxes & Fees</span>
+      <span class="summary-value">$2.50</span>
+    </div>
+    <div class="divider"></div>
+    <div class="summary-row total">
+      <span class="summary-label">Total</span>
+      <span class="summary-value">${{ (totalPrice + 2.50) | number:'1.2-2' }}</span>
+    </div>
+    
+    <ion-button expand="block" shape="round" class="checkout-btn" (click)="goToCheckout()">
+      Proceed to Checkout
+    </ion-button>
+  </div>
+</ion-content>

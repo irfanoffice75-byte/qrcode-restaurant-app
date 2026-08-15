@@ -1,0 +1,131 @@
+ion-content {
+  --background: #f8f9fa;
+}
+
+.success-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px;
+}
+
+.animation-container {
+  margin-bottom: 30px;
+  
+  .circle {
+    width: 100px;
+    height: 100px;
+    background: #2ecc71;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 24px rgba(46, 204, 113, 0.4);
+    animation: scale-up 0.5s ease-out;
+    
+    ion-icon {
+      font-size: 50px;
+      color: white;
+    }
+  }
+}
+
+.success-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #2d3436;
+  margin: 0 0 10px 0;
+}
+
+.success-message {
+  font-size: 16px;
+  color: #636e72;
+  text-align: center;
+  margin: 0 0 40px 0;
+}
+
+.order-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  margin-bottom: 40px;
+  
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .label {
+      font-size: 14px;
+      color: #b2bec3;
+    }
+    
+    .value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #2d3436;
+    }
+  }
+  
+  .divider {
+    height: 1px;
+    background: #dfe6e9;
+    margin: 20px 0;
+    border-style: dashed;
+    border-width: 1px;
+    border-color: #dfe6e9;
+    background: none;
+  }
+  
+  .order-details {
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      
+      &:last-child {
+        margin-bottom: 0;
+        margin-top: 20px;
+      }
+      
+      .label {
+        font-size: 15px;
+        color: #636e72;
+      }
+      
+      .value {
+        font-size: 15px;
+        font-weight: 600;
+        color: #2d3436;
+        
+        &.amount {
+          font-size: 20px;
+          font-weight: 800;
+          color: #ff4757;
+        }
+      }
+    }
+  }
+}
+
+.action-buttons {
+  width: 100%;
+  
+  .track-btn {
+    --background: #ff4757;
+    --background-hover: #ff6b6b;
+    margin: 0;
+    height: 56px;
+    font-weight: 600;
+    font-size: 18px;
+  }
+}
+
+@keyframes scale-up {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}

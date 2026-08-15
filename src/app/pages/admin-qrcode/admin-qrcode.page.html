@@ -1,0 +1,77 @@
+<ion-header class="ion-no-border custom-header">
+  <ion-toolbar color="transparent">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" color="dark">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">QR Generator</ion-title>
+    <ion-buttons slot="end">
+      <ion-button disabled>
+        <ion-icon name="qr-code-outline" style="opacity: 0;"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="qr-container">
+    
+    <div class="header-text">
+      <h2>Table QR Management</h2>
+      <p>Generate, print, and manage QR codes for all your tables.</p>
+    </div>
+
+    <div class="input-section">
+      <div class="input-group">
+        <ion-label>Server URL / IP Address</ion-label>
+        <ion-input [(ngModel)]="serverUrl" (ngModelChange)="updateServerUrl()" placeholder="e.g., https://qr-code-restaurant-7ba27.web.app"></ion-input>
+      </div>
+    </div>
+    
+    <ion-button expand="block" shape="round" color="danger" class="create-btn" (click)="addTable()">
+      <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+      Create New Table QR Code
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" color="danger" class="create-btn" (click)="deleteAllTables()" *ngIf="tables.length > 0">
+      <ion-icon name="trash-outline" slot="start"></ion-icon>
+      Delete All Tables & Reset
+    </ion-button>
+
+    
+    <div class="empty-state" *ngIf="tables.length === 0">
+      <ion-icon name="qr-code-outline"></ion-icon>
+      <h3>No Tables Yet</h3>
+      <p>Click the button above to generate your first table QR code.</p>
+    </div>
+
+    <div class="table-grid">
+      <div class="qr-display-card" *ngFor="let table of tables">
+        <div class="card-header">
+          <div class="table-badge">Table {{ table.tableNumber || '?' }}</div>
+          <ion-button fill="clear" color="medium" size="small" (click)="editTable(table)">
+            <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+        
+        <div class="qr-image-wrapper">
+          <img [src]="table.qrImageUrl" alt="QR Code" *ngIf="table.qrImageUrl" />
+          <ion-spinner name="crescent" *ngIf="!table.qrImageUrl" color="danger"></ion-spinner>
+        </div>
+        <p class="scan-text">Scan to view the menu and order!</p>
+        
+        <div class="action-buttons-row">
+          <ion-button fill="outline" color="primary" size="small" (click)="downloadQR(table)">
+            <ion-icon name="download-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+          
+          <ion-button fill="outline" color="danger" size="small" (click)="deleteTable(table)">
+            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

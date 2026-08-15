@@ -1,0 +1,143 @@
+<ion-header class="ion-no-border custom-header">
+  <ion-toolbar color="transparent">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" color="dark">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Kitchen Dashboard</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="goToBills()" color="dark" title="Table Bills">
+        <ion-icon name="receipt-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="goToQRGenerator()" color="dark">
+        <ion-icon name="qr-code-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="goToMenu()" color="dark">
+        <ion-icon name="list-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  
+  <div class="segment-container">
+    <ion-segment [value]="currentSegment" (ionChange)="segmentChanged($event)" mode="ios">
+      <ion-segment-button value="new">
+        <ion-label>New ({{ getOrderCount('new') }})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="preparing">
+        <ion-label>Preparing ({{ getOrderCount('preparing') }})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="ready">
+        <ion-label>Ready ({{ getOrderCount('ready') }})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="served">
+        <ion-label>Served ({{ getOrderCount('served') }})</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+</ion-header>
+
+<ion-content>
+  <div style="padding: 10px; background: #333; color: white; font-size: 12px; margin-bottom: 10px; text-align: center;">
+    DEBUG - Total Orders: {{ orders.length }} | Showing in {{ currentSegment }}: {{ filteredOrders.length }}
+  </div>
+  <div class="dashboard-container">
+    
+    <div class="empty-state" *ngIf="filteredOrders.length === 0">
+      <ion-icon name="document-text-outline"></ion-icon>
+      <h2>No Orders Here</h2>
+      <p>There are no orders in the "{{ currentSegment }}" status right now.</p>
+    </div>
+
+    <div class="order-list" *ngIf="filteredOrders.length > 0">
+      
+      <div class="order-card" *ngFor="let order of filteredOrders; trackBy: trackByOrderId" [id]="'order-' + order.id" [class.highlighted]="highlightId === order.id">
+          <div class="card-header">
+            <div>
+              <span class="table-badge">Table {{ order.tableNumber }}</span>
+              <span class="customer-name" *ngIf="order.customerName && order.customerName !== 'Guest'"> - {{ order.customerName }}</span>
+            </div>
+            <div class="time-badge">{{ order.createdAt | date:'shortTime' }}</div>
+          </div>
+        
+        <div class="order-id">#{{ order.id }} - <span class="status">{{ order.status }}</span></div>
+        
+        <div class="divider"></div>
+        
+        <div class="item-list">
+          <div class="order-item" *ngFor="let item of order.items">
+            <div class="item-main">
+              <span class="qty">{{ item.quantity }}x</span>
+              <span class="name">{{ item.menuItem.name }}</span>
+            </div>
+            <div class="instructions" *ngIf="item.specialInstructions">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              {{ item.specialInstructions }}
+            </div>
+          </div>
+        </div>
+        
+        <ng-container *ngIf="currentSegment === 'served'">
+          <div class="divider"></div>
+          <div style="display: flex; justify-content: space-between; padding: 10px 15px; font-weight: bold; font-size: 16px; color: var(--ion-color-dark);">
+            <span>Total Bill:</span>
+            <span>${{ order.totalPrice | number:'1.2-2' }}</span>
+          </div>
+        </ng-container>
+
+        <div class="divider"></div>
+        
+        <div class="action-buttons">
+          <!-- Actions for Active/New Orders -->
+          <ng-container *ngIf="order.status === 'active'">
+            <ion-button expand="block" fill="outline" color="medium" disabled>
+              Customer is Ordering...
+            </ion-button>
+          </ng-container>
+
+          <ng-container *ngIf="order.status === 'Order Placed' || order.status === 'Pending'">
+            <div *ngIf="order.paymentStatus !== 'paid'" style="display: flex; justify-content: space-between; padding: 0 5px 15px 5px; font-weight: bold; font-size: 16px; color: var(--ion-color-dark);">
+              <span>Total Bill:</span>
+              <span>${{ order.totalPrice | number:'1.2-2' }}</span>
+            </div>
+            <ion-button *ngIf="order.paymentStatus !== 'paid'" expand="block" color="success" (click)="collectPayment(order)">
+              Collect Payment
+            </ion-button>
+            <ion-button *ngIf="order.paymentStatus === 'paid'" expand="block" color="warning" (click)="updateStatus(order, 'Accepted')">
+              Accept Order
+            </ion-button>
+          </ng-container>
+          
+          <ng-container *ngIf="order.status === 'Accepted'">
+            <ion-button expand="block" color="tertiary" (click)="updateStatus(order, 'Preparing')">
+              Start Preparing
+            </ion-button>
+          </ng-container>
+
+          <!-- Actions for Preparing -->
+          <ng-container *ngIf="order.status === 'Preparing'">
+            <ion-button expand="block" color="success" (click)="updateStatus(order, 'Ready')">
+              Mark as Ready
+            </ion-button>
+          </ng-container>
+
+          <!-- Actions for Ready -->
+          <ng-container *ngIf="order.status === 'Ready'">
+            <ion-button expand="block" color="primary" (click)="updateStatus(order, 'Served')">
+              Mark as Served
+            </ion-button>
+          </ng-container>
+          
+          <!-- Actions for Served -->
+          <ng-container *ngIf="order.status === 'Served'">
+            <ion-button expand="block" color="success" (click)="updateStatus(order, 'Completed')">
+              Order Completed
+            </ion-button>
+          </ng-container>
+        </div>
+        
+      </div>
+    </div>
+    
+  </div>
+</ion-content>

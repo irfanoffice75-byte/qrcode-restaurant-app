@@ -1,0 +1,42 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="transparent">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" color="dark">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Scan QR Code</ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="dark">
+        <ion-icon name="flash-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="scanner-container">
+    <div class="camera-view">
+      <!-- Simulated Camera Frame -->
+      <div class="scan-overlay">
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+        
+        <div class="scan-line" [class.scanning]="isScanning"></div>
+      </div>
+    </div>
+    
+    <div class="instruction-text">
+      <p>Point your camera at the QR code<br>on your table to view the menu</p>
+    </div>
+
+    <div class="action-container">
+      <ion-button expand="block" shape="round" class="simulate-btn" (click)="simulateScan()" [disabled]="isScanning">
+        <ion-spinner name="crescent" *ngIf="isScanning"></ion-spinner>
+        <span *ngIf="!isScanning">Simulate Scan (Table 5)</span>
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

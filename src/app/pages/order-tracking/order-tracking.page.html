@@ -1,0 +1,152 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="transparent">
+    <ion-buttons slot="start">
+      <ion-button (click)="goHome()" color="dark">
+        <ion-icon name="home-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Order Status</ion-title>
+    <ion-buttons slot="end">
+      <ion-button disabled>
+        <ion-icon name="ellipsis-vertical" style="opacity: 0;"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- ✅ Order Paid Screen — shown when admin marks order as Paid -->
+  <div class="paid-success-container" *ngIf="orderPaid">
+    <div class="paid-icon-wrap">
+      <ion-icon name="checkmark-circle" color="success"></ion-icon>
+    </div>
+    <h2>Order Paid!</h2>
+    <p>Thank you! Your bill has been settled. We hope you enjoyed your meal.</p>
+    <ion-button expand="block" shape="round" color="success" (click)="startNewOrder()" style="margin-top: 24px;">
+      <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+      Start New Order
+    </ion-button>
+  </div>
+
+  <!-- Empty State (No Active Orders) -->
+  <div class="empty-state-container" *ngIf="activeOrders.length === 0 && !orderPaid" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 70vh; padding: 20px; text-align: center;">
+    <ion-icon name="document-text-outline" style="font-size: 80px; color: #ccc; margin-bottom: 20px;"></ion-icon>
+    <h2 style="margin: 0; color: var(--ion-color-dark);">No Active Orders</h2>
+    <p style="color: var(--ion-color-medium); margin-top: 10px; margin-bottom: 30px;">You don't have any orders in progress right now.</p>
+    <ion-button expand="block" shape="round" color="danger" (click)="goHome()" style="width: 100%; max-width: 300px;">
+      <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+      Add Order
+    </ion-button>
+  </div>
+
+  <!-- Active orders only -->
+  <div class="tracking-container" *ngFor="let order of activeOrders; let i = index">
+
+    <div class="order-label" *ngIf="activeOrders.length > 1">
+      <ion-badge color="medium">Order {{ activeOrders.length - i }}</ion-badge>
+      <ion-badge color="warning">In Progress</ion-badge>
+    </div>
+
+    <div class="order-info-card">
+      <div class="header">
+        <h2>Order #{{ order.id }}</h2>
+        <ion-badge color="warning" *ngIf="activeOrders.length === 1">In Progress</ion-badge>
+      </div>
+      <div class="details">
+        <div class="item">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>{{ order.createdAt | date:'shortTime' }}</span>
+        </div>
+        <div class="item">
+          <ion-icon name="restaurant-outline"></ion-icon>
+          <span>Table {{ order.tableNumber }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="order-items-card">
+      <h3 class="section-title">Order Items</h3>
+      <div class="item-list">
+        <div class="order-item" *ngFor="let item of order.items">
+          <div class="item-qty">{{ item.quantity }}x</div>
+          <div class="item-details">
+            <span class="item-name">{{ item.menuItem.name }}</span>
+            <span class="item-instructions" *ngIf="item.specialInstructions">{{ item.specialInstructions }}</span>
+          </div>
+          <div class="item-price">${{ (item.menuItem.price * item.quantity) | number:'1.2-2' }}</div>
+        </div>
+      </div>
+      <div class="total-row">
+        <span>Total</span>
+        <span class="total-price">${{ order.totalPrice | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="timeline-container">
+      <div class="timeline-item" *ngFor="let status of statuses; let j = index"
+           [class.active]="isStatusActive(order, status.title)"
+           [class.completed]="isStatusReached(order, status.title)">
+
+        <div class="timeline-line" *ngIf="j < statuses.length - 1"></div>
+
+        <div class="timeline-icon">
+          <ion-icon [name]="status.icon"></ion-icon>
+        </div>
+
+        <div class="timeline-content">
+          <h3>{{ status.title }}</h3>
+          <p>{{ status.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <hr *ngIf="i < activeOrders.length - 1" style="margin: 16px 0; border-color: #eee;" />
+
+  </div>
+
+  <!-- Action buttons -->
+  <div class="order-more-container" *ngIf="activeOrders.length > 0">
+    <ion-button expand="block" shape="round" color="danger" fill="outline" (click)="goHome()">
+      Order More Food
+    </ion-button>
+
+    <!-- History button -->
+    <ion-button expand="block" shape="round" color="medium" fill="outline" (click)="toggleHistory()">
+      <ion-icon name="time-outline" slot="start"></ion-icon>
+      {{ showHistory ? 'Hide History' : 'History' }}
+    </ion-button>
+  </div>
+
+  <!-- History section — only shown after clicking History button -->
+  <div class="history-section" *ngIf="showHistory">
+    <h3 class="history-title">Previous Orders</h3>
+
+    <div class="history-loading" *ngIf="historyLoading">
+      <ion-spinner name="crescent" color="danger"></ion-spinner>
+      <p>Loading history...</p>
+    </div>
+
+    <div class="history-empty" *ngIf="!historyLoading && completedHistory.length === 0">
+      <ion-icon name="receipt-outline"></ion-icon>
+      <p>No previous completed orders found.</p>
+    </div>
+
+    <div class="history-card" *ngFor="let h of completedHistory">
+      <div class="history-card-header">
+        <span class="history-date">{{ h.completedAt | date:'MMM d · h:mm a' }}</span>
+        <ion-badge color="success">Paid</ion-badge>
+      </div>
+      <div class="history-items-list">
+        <span *ngFor="let item of h.items; let last = last">
+          {{ item.quantity }}× {{ item.menuItem.name }}<span *ngIf="!last">, </span>
+        </span>
+      </div>
+      <div class="history-footer">
+        <span>Table {{ h.tableNumber }}</span>
+        <span class="history-total">${{ h.finalTotal | number:'1.2-2' }}</span>
+      </div>
+    </div>
+  </div>
+
+</ion-content>

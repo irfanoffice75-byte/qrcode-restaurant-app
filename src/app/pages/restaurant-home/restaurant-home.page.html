@@ -1,0 +1,168 @@
+<ion-header class="ion-no-border custom-header">
+  <ion-toolbar color="transparent">
+    <ion-buttons slot="start">
+      <!-- Grid button removed as per user request -->
+    </ion-buttons>
+    <div class="header-content">
+      <h2 class="restaurant-name">{{ restaurantName }}</h2>
+      <p class="table-info" *ngIf="tableNumber">Table No: <span>{{ tableNumber }}</span></p>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button color="dark" class="profile-btn" (click)="openHistory()">
+        <ion-icon name="time-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="main-container">
+    <div class="greeting-section">
+      <h1>What would you like<br>to order?</h1>
+    </div>
+
+    <div class="tracking-banner" *ngIf="currentOrder && currentOrder.status !== 'Served'" (click)="goToTracking()">
+      <div class="tracking-content">
+        <ion-icon name="restaurant"></ion-icon>
+        <div class="tracking-text">
+          <h3>Order {{ currentOrder.status }}</h3>
+          <p>Tap to view live tracking</p>
+        </div>
+      </div>
+      <ion-icon name="chevron-forward" class="arrow-icon"></ion-icon>
+    </div>
+
+
+
+    <div class="search-section">
+      <ion-searchbar 
+        placeholder="Search for food..." 
+        mode="ios" 
+        (ionInput)="onSearch($event)"
+        class="custom-searchbar">
+      </ion-searchbar>
+    </div>
+
+    <div class="categories-section">
+      <div class="category-scroll">
+        <div class="category-chip" 
+             [class.active]="selectedCategoryId === 'all'" 
+             (click)="selectCategory('all')">
+          <ion-icon name="apps-outline"></ion-icon>
+          <span>All</span>
+        </div>
+        <div class="category-chip" 
+             *ngFor="let cat of categories" 
+             [class.active]="selectedCategoryId === cat.id"
+             (click)="selectCategory(cat.id)">
+          <ion-icon [name]="cat.icon"></ion-icon>
+          <span>{{ cat.name }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="popular-section">
+      <h2 class="section-title">Menu Items</h2>
+      
+      <div class="food-list">
+        <div class="food-card" *ngFor="let item of displayedMenuItems" (click)="goToDetails(item)">
+          <div class="card-image-wrapper">
+            <img [src]="item.imageUrl" [alt]="item.name" class="food-img">
+            <div class="veg-badge" [class.non-veg]="!item.isVeg">
+              <span class="dot"></span>
+            </div>
+            <div class="rating-badge">
+              <ion-icon name="star"></ion-icon>
+              <span>{{ item.rating }}</span>
+            </div>
+          </div>
+          <div class="card-details">
+            <h3 class="food-name">{{ item.name }}</h3>
+            <p class="food-desc">{{ item.description }}</p>
+            <div class="price-row">
+              <span class="price">${{ item.price | number:'1.2-2' }}</span>
+              <div class="quantity-control" *ngIf="getItemQuantity(item) > 0; else addBtn">
+                <button class="qty-btn" (click)="updateQuantity(item, -1, $event)">
+                  <ion-icon name="remove"></ion-icon>
+                </button>
+                <span class="qty-text">{{ getItemQuantity(item) }}</span>
+                <button class="qty-btn" (click)="updateQuantity(item, 1, $event)">
+                  <ion-icon name="add"></ion-icon>
+                </button>
+              </div>
+              <ng-template #addBtn>
+                <button class="add-btn" (click)="quickAdd(item, $event)">
+                  <ion-icon name="add"></ion-icon>
+                </button>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-state" *ngIf="displayedMenuItems.length === 0">
+          <ion-icon name="search-outline"></ion-icon>
+          <p>No food items found.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Bottom Cart Bar -->
+  <div class="floating-cart-container" *ngIf="cartItemCount > 0">
+    <div class="floating-cart-bar" (click)="goToCart()">
+      <div class="cart-bar-left">
+        <div class="cart-item-img">
+          <img [src]="cartItems[0]?.menuItem?.imageUrl || 'assets/icon/favicon.png'" />
+        </div>
+        <div class="cart-bar-text">
+          <span class="view-cart-title">View cart</span>
+          <span class="item-count">{{ cartItemCount }} Item{{ cartItemCount > 1 ? 's' : '' }}</span>
+        </div>
+      </div>
+      <div class="cart-bar-right">
+        <ion-icon name="chevron-forward"></ion-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Previous Order History Modal -->
+  <div class="history-overlay" *ngIf="showHistoryModal" (click)="closeHistory()"></div>
+  <div class="history-sheet" [class.open]="showHistoryModal">
+    <div class="history-handle"></div>
+    <div class="history-header">
+      <h3>Order History</h3>
+      <ion-button fill="clear" color="dark" (click)="closeHistory()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="history-loading" *ngIf="historyLoading">
+      <ion-spinner name="crescent" color="danger"></ion-spinner>
+      <p>Loading history...</p>
+    </div>
+
+    <div class="history-empty" *ngIf="!historyLoading && orderHistory.length === 0">
+      <ion-icon name="receipt-outline"></ion-icon>
+      <p>No previous orders found.</p>
+    </div>
+
+    <div class="history-list" *ngIf="!historyLoading && orderHistory.length > 0">
+      <div class="history-card" *ngFor="let h of orderHistory">
+        <div class="history-card-header">
+          <span class="history-date">{{ h.completedAt | date:'MMM d, y · h:mm a' }}</span>
+          <ion-badge color="success">Paid</ion-badge>
+        </div>
+        <div class="history-items">
+          <span *ngFor="let item of h.items; let last = last">
+            {{ item.quantity }}× {{ item.menuItem.name }}<span *ngIf="!last">, </span>
+          </span>
+        </div>
+        <div class="history-total">
+          <span>Table {{ h.tableNumber }}</span>
+          <span class="history-amount">${{ h.finalTotal | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</ion-content>

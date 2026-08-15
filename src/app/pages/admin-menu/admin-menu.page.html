@@ -1,0 +1,184 @@
+<ion-header class="ion-no-border custom-header">
+  <ion-toolbar color="transparent">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" color="dark">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Menu Management</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleForm()" color="danger">
+        <ion-icon [name]="showForm ? 'close-outline' : 'add-outline'"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  
+  <div class="segment-container" style="padding: 10px;">
+    <ion-segment [(ngModel)]="currentView" mode="ios">
+      <ion-segment-button value="items">
+        <ion-label>Food Items</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="categories">
+        <ion-label>Categories</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <!-- Food Items View -->
+  <div *ngIf="currentView === 'items'">
+  <!-- Add Item Form -->
+  <div class="form-container" *ngIf="showForm">
+    <h2 class="form-title">Add New Food Item</h2>
+    
+    <ion-list lines="none" class="custom-form">
+      
+      <div class="input-group">
+        <ion-label>Food Name</ion-label>
+        <ion-input [(ngModel)]="newItem.name" placeholder="e.g., Spicy Chicken Wings"></ion-input>
+      </div>
+      
+      <div class="input-group">
+        <ion-label>Description</ion-label>
+        <ion-textarea [(ngModel)]="newItem.description" placeholder="Short description of the food..." rows="3"></ion-textarea>
+      </div>
+      
+      <div class="input-group">
+        <ion-label>Price ($)</ion-label>
+        <ion-input type="number" [(ngModel)]="newItem.price" placeholder="e.g., 12.99"></ion-input>
+      </div>
+      
+      <div class="input-group">
+        <ion-label>Food Image</ion-label>
+        
+        <div class="image-upload-container">
+          <div class="image-preview" *ngIf="newItem.imageUrl" [style.backgroundImage]="'url(' + newItem.imageUrl + ')'">
+            <ion-button fill="clear" color="light" class="remove-img-btn" (click)="removeImage()">
+              <ion-icon name="close-circle"></ion-icon>
+            </ion-button>
+          </div>
+          
+          <div class="upload-btn-wrapper" *ngIf="!newItem.imageUrl">
+            <ion-button expand="block" fill="outline" color="medium" class="upload-btn" (click)="fileInput.click()">
+              <ion-icon name="image-outline" slot="start"></ion-icon>
+              Choose Photo
+            </ion-button>
+            <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;">
+          </div>
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <ion-label>Category</ion-label>
+        <ion-select [(ngModel)]="newItem.categoryId" interface="action-sheet">
+          <ion-select-option *ngFor="let cat of categories" [value]="cat.id">
+            {{ cat.name }}
+          </ion-select-option>
+        </ion-select>
+      </div>
+      
+      <div class="input-group toggle-group">
+        <ion-label>Dietary</ion-label>
+        <ion-segment [(ngModel)]="newItem.isVeg" mode="ios">
+          <ion-segment-button [value]="true">
+            <ion-label>Veg</ion-label>
+          </ion-segment-button>
+          <ion-segment-button [value]="false">
+            <ion-label>Non-Veg</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+      
+      <ion-button expand="block" shape="round" color="danger" class="save-btn" (click)="saveItem()">
+        Save Item
+      </ion-button>
+      
+    </ion-list>
+  </div>
+
+  <!-- Current Menu List -->
+  <div class="menu-list-container" *ngIf="!showForm">
+    <div class="list-header">
+      <h2>Current Menu</h2>
+      <span class="count">{{ menuItems.length }} items</span>
+    </div>
+    
+    <div class="food-card" *ngFor="let item of menuItems">
+      <div class="img-container">
+        <img [src]="item.imageUrl" [alt]="item.name" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'">
+      </div>
+      <div class="card-details">
+        <h3 class="name">{{ item.name }}</h3>
+        <p class="category">{{ getCategoryName(item.categoryId) }}</p>
+        <div class="price-row">
+          <span class="price">${{ item.price | number:'1.2-2' }}</span>
+          <div class="card-actions">
+            <div class="veg-badge" [class.non-veg]="!item.isVeg">
+              <span class="dot"></span>
+            </div>
+            <ion-button fill="clear" color="danger" size="small" (click)="deleteItem(item)">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div> <!-- End Current Menu List -->
+  </div> <!-- End Food Items View -->
+
+  <!-- Categories View -->
+  <div *ngIf="currentView === 'categories'">
+    <!-- Add Category Form -->
+    <div class="form-container" *ngIf="showCategoryForm">
+      <h2 class="form-title">Add New Category</h2>
+      
+      <ion-list lines="none" class="custom-form">
+        <div class="input-group">
+          <ion-label>Category Name</ion-label>
+          <ion-input [(ngModel)]="newCategory.name" placeholder="e.g., Beverages"></ion-input>
+        </div>
+        
+        <div class="input-group">
+          <ion-label>Icon (Optional)</ion-label>
+          <ion-input [(ngModel)]="newCategory.icon" placeholder="e.g., fast-food-outline"></ion-input>
+          <p style="font-size: 12px; color: gray; margin-top: 4px;">Defaults to 'fast-food-outline' if blank.</p>
+        </div>
+        
+        <ion-button expand="block" shape="round" color="danger" class="save-btn" (click)="saveCategory()">
+          Save Category
+        </ion-button>
+      </ion-list>
+    </div>
+
+    <!-- Category List -->
+    <div class="menu-list-container" *ngIf="!showCategoryForm">
+      <div class="list-header" style="display: flex; justify-content: space-between; align-items: center; padding: 0 16px;">
+        <h2>All Categories</h2>
+        <ion-button size="small" color="danger" fill="outline" (click)="toggleCategoryForm()">
+          <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+      
+      <ion-list lines="full" style="background: transparent;">
+        <ion-item *ngFor="let cat of categories" style="--background: white; margin: 10px 16px; border-radius: 12px; --padding-start: 16px;">
+          <ion-icon [name]="cat.icon" slot="start" color="danger"></ion-icon>
+          <ion-label>
+            <h2>{{ cat.name }}</h2>
+          </ion-label>
+          <ion-button fill="clear" color="danger" slot="end" (click)="deleteCategory(cat)">
+            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-item>
+        
+        <div *ngIf="categories.length === 0" style="text-align: center; padding: 30px; color: gray;">
+          <ion-icon name="folder-open-outline" style="font-size: 48px; opacity: 0.5;"></ion-icon>
+          <p>No categories found. Create one first!</p>
+        </div>
+      </ion-list>
+    </div>
+  </div>
+
+</ion-content>

@@ -1,0 +1,259 @@
+ion-content {
+  --background: #f8f9fa;
+}
+
+.header-image-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  
+  .header-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .circular-btn {
+    --background: rgba(255, 255, 255, 0.9);
+    --color: #2d3436;
+    --border-radius: 50%;
+    --padding-start: 0;
+    --padding-end: 0;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    
+    ion-icon {
+      font-size: 24px;
+    }
+  }
+  
+  .back-btn-wrapper {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+  }
+  
+  .fav-btn-wrapper {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    
+    .circular-btn {
+      --color: #ff4757;
+    }
+  }
+}
+
+.content-container {
+  padding: 24px 24px 0 24px;
+}
+
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  
+  .food-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #2d3436;
+    margin: 0;
+    line-height: 1.2;
+    flex: 1;
+    padding-right: 16px;
+  }
+  
+  .veg-indicator {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #2ecc71;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    margin-top: 4px;
+    
+    .dot {
+      width: 10px;
+      height: 10px;
+      background: #2ecc71;
+      border-radius: 50%;
+    }
+    
+    &.non-veg {
+      border-color: #e74c3c;
+      .dot {
+        background: #e74c3c;
+      }
+    }
+  }
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  
+  .rating {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #2d3436;
+    
+    ion-icon {
+      color: #f1c40f;
+      margin-right: 6px;
+      font-size: 20px;
+    }
+  }
+  
+  .price {
+    font-size: 26px;
+    font-weight: 800;
+    color: #ff4757;
+  }
+}
+
+.divider {
+  height: 1px;
+  background: #dfe6e9;
+  margin-bottom: 24px;
+}
+
+.section {
+  margin-bottom: 24px;
+  
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2d3436;
+    margin: 0 0 12px 0;
+  }
+  
+  .description-text {
+    font-size: 15px;
+    color: #636e72;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+.quantity-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .section-title {
+    margin: 0;
+  }
+  
+  .quantity-selector {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 4px;
+    
+    .qty-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #f1f2f6;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #2d3436;
+      
+      ion-icon {
+        font-size: 20px;
+      }
+      
+      &:disabled {
+        opacity: 0.5;
+      }
+    }
+    
+    .qty-value {
+      font-size: 18px;
+      font-weight: 700;
+      width: 40px;
+      text-align: center;
+    }
+  }
+}
+
+.custom-textarea {
+  --background: #ffffff;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  --border-radius: 16px;
+  border: 1px solid #dfe6e9;
+  border-radius: 16px;
+  margin: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+.bottom-spacer {
+  height: 100px;
+}
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  padding: 16px 24px;
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  
+  .total-info {
+    display: flex;
+    flex-direction: column;
+    
+    .total-label {
+      font-size: 13px;
+      color: #b2bec3;
+      margin-bottom: 4px;
+    }
+    
+    .total-price {
+      font-size: 22px;
+      font-weight: 800;
+      color: #2d3436;
+    }
+  }
+  
+  .add-cart-btn {
+    --background: #ff4757;
+    --background-hover: #ff6b6b;
+    --background-activated: #ee5253;
+    --box-shadow: 0 8px 20px rgba(255, 71, 87, 0.4);
+    margin: 0;
+    height: 54px;
+    width: 160px;
+    font-weight: 600;
+    font-size: 16px;
+  }
+}

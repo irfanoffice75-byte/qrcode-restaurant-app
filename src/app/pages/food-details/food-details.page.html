@@ -1,0 +1,80 @@
+<ion-content [fullscreen]="true" *ngIf="menuItem">
+  <div class="header-image-container">
+    <ion-buttons class="back-btn-wrapper">
+      <ion-button (click)="goBack()" class="circular-btn">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    
+    <ion-buttons class="fav-btn-wrapper">
+      <ion-button class="circular-btn">
+        <ion-icon name="heart-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <img [src]="menuItem.imageUrl" [alt]="menuItem.name" class="header-image">
+  </div>
+
+  <div class="content-container">
+    <div class="title-row">
+      <h1 class="food-title">{{ menuItem.name }}</h1>
+      <div class="veg-indicator" [class.non-veg]="!menuItem.isVeg">
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <div class="meta-row">
+      <div class="rating">
+        <ion-icon name="star"></ion-icon>
+        <span>{{ menuItem.rating }}</span>
+      </div>
+      <div class="price">
+        ${{ menuItem.price | number:'1.2-2' }}
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <h3 class="section-title">Description</h3>
+      <p class="description-text">{{ menuItem.description }}</p>
+    </div>
+
+    <div class="section quantity-section">
+      <h3 class="section-title">Quantity</h3>
+      <div class="quantity-selector">
+        <button class="qty-btn" (click)="decreaseQuantity()" [disabled]="quantity <= 1">
+          <ion-icon name="remove"></ion-icon>
+        </button>
+        <span class="qty-value">{{ quantity }}</span>
+        <button class="qty-btn" (click)="increaseQuantity()">
+          <ion-icon name="add"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Special Instructions</h3>
+      <ion-textarea 
+        class="custom-textarea"
+        placeholder="E.g. No onions, extra spicy, etc."
+        [(ngModel)]="specialInstructions"
+        auto-grow="true"
+        rows="3">
+      </ion-textarea>
+    </div>
+    
+    <!-- Spacer for bottom fixed bar -->
+    <div class="bottom-spacer"></div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="total-info">
+      <span class="total-label">Total Price</span>
+      <span class="total-price">${{ totalPrice | number:'1.2-2' }}</span>
+    </div>
+    <ion-button class="add-cart-btn" (click)="addToCart()" shape="round">
+      Add to Cart
+    </ion-button>
+  </div>
+</ion-content>

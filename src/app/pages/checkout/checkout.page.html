@@ -1,0 +1,102 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="transparent">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" color="dark">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Checkout</ion-title>
+    <ion-buttons slot="end">
+      <ion-button disabled>
+        <ion-icon name="ellipsis-vertical" style="opacity: 0;"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="checkout-container">
+    <div class="section-card">
+      <div class="section-header">
+        <ion-icon name="restaurant-outline"></ion-icon>
+        <h3>Dine-In Details</h3>
+      </div>
+      <div class="table-info">
+        <div class="info-label">Table Number</div>
+        <div class="info-value">{{ tableNumber }}</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <ion-icon name="receipt-outline"></ion-icon>
+        <h3>Order Summary</h3>
+      </div>
+      
+      <div class="order-items">
+        <div class="order-item" *ngFor="let item of cartItems">
+          <span class="qty">{{ item.quantity }}x</span>
+          <span class="name">{{ item.menuItem.name }}</span>
+          <span class="price">${{ (item.menuItem.price * item.quantity) | number:'1.2-2' }}</span>
+        </div>
+      </div>
+      
+      <div class="divider"></div>
+      
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span>${{ subtotal | number:'1.2-2' }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Taxes & Fees</span>
+        <span>${{ taxes | number:'1.2-2' }}</span>
+      </div>
+      <div class="summary-row total-row">
+        <span>Total</span>
+        <span class="total-amount">${{ total | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <ion-icon name="card-outline"></ion-icon>
+        <h3>Payment Method</h3>
+      </div>
+      
+      <ion-radio-group [(ngModel)]="paymentMethod">
+        <div class="payment-option" (click)="paymentMethod = 'card'">
+          <div class="payment-details">
+            <ion-icon name="card" class="pay-icon card"></ion-icon>
+            <span>Credit/Debit Card</span>
+          </div>
+          <ion-radio value="card" color="danger"></ion-radio>
+        </div>
+        
+        <div class="payment-option" (click)="paymentMethod = 'apple'">
+          <div class="payment-details">
+            <ion-icon name="logo-apple" class="pay-icon apple"></ion-icon>
+            <span>Apple Pay</span>
+          </div>
+          <ion-radio value="apple" color="danger"></ion-radio>
+        </div>
+        
+        <div class="payment-option" (click)="paymentMethod = 'cash'">
+          <div class="payment-details">
+            <ion-icon name="cash-outline" class="pay-icon cash"></ion-icon>
+            <span>Pay with Cash at Counter</span>
+          </div>
+          <ion-radio value="cash" color="danger"></ion-radio>
+        </div>
+      </ion-radio-group>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <div class="footer-container">
+    <ion-button expand="block" shape="round" class="place-order-btn" (click)="placeOrder()" [disabled]="isProcessing">
+      <ion-spinner name="crescent" *ngIf="isProcessing"></ion-spinner>
+      <span *ngIf="!isProcessing">Place Order - ${{ total | number:'1.2-2' }}</span>
+    </ion-button>
+  </div>
+</ion-footer>

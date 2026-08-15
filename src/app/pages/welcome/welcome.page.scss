@@ -1,0 +1,274 @@
+ion-content {
+  --background: #ffffff;
+}
+
+.welcome-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.image-wrapper {
+  position: relative;
+  flex: 1.4;
+  width: 100%;
+  overflow: hidden;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+
+  .welcome-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gradient-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%);
+  }
+}
+
+.content-section {
+  flex: 1;
+  padding: 36px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.title {
+  font-size: 30px;
+  font-weight: 800;
+  color: #2d3436;
+  margin: 0 0 28px 0;
+  line-height: 1.2;
+}
+
+// ── QR Instruction Box ─────────────────────────────────────────────
+.qr-instruction-box {
+  background: #fff8f8;
+  border: 2px dashed #ff4757;
+  border-radius: 20px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+
+  .qr-icon {
+    font-size: 64px;
+    color: #ff4757;
+  }
+
+  .instruction-text {
+    font-size: 16px;
+    color: #636e72;
+    line-height: 1.6;
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+// ── Loading Section ────────────────────────────────────────────────
+.loading-section {
+  gap: 16px;
+
+  ion-spinner {
+    width: 48px;
+    height: 48px;
+  }
+
+  .loading-text {
+    font-size: 16px;
+    color: #636e72;
+    margin: 0;
+  }
+}
+
+
+// -- Admin UI Redesign ---------------------------------------------
+.admin-image-wrapper {
+  border-bottom-left-radius: 50% 15%;
+  border-bottom-right-radius: 50% 15%;
+  flex: 1.2;
+}
+
+.admin-badge {
+  width: 80px;
+  height: 80px;
+  background: #ffffff;
+  border-radius: 50%;
+  border: 4px solid #f6e8d6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -76px;
+  margin-bottom: 24px;
+  z-index: 10;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+
+  ion-icon {
+    font-size: 40px;
+    color: #cda87c;
+  }
+}
+
+.admin-title {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+
+  .welcome-text {
+    color: #0f172a;
+  }
+
+  .admin-text {
+    color: #cda87c;
+  }
+}
+
+.admin-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  width: 100%;
+
+  .line {
+    height: 1px;
+    width: 40px;
+    background-color: #cda87c;
+  }
+
+  .divider-icon {
+    color: #cda87c;
+    font-size: 20px;
+  }
+}
+
+.admin-subtitle {
+  font-size: 16px;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 40px 0;
+  font-weight: 500;
+}
+
+.admin-login-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.admin-action-btn {
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 16px;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 340px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+  }
+
+  .btn-icon-left {
+    font-size: 24px;
+    color: #cda87c;
+  }
+
+  .btn-text {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 12px;
+    text-align: center;
+  }
+
+  .btn-icon-right {
+    font-size: 20px;
+    color: #ffffff;
+  }
+}
+
+
+
+// -- Full Screen Loader ---------------------------------------------
+.full-screen-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  background-color: #ffffff;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  text-align: center;
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.illustration-wrapper {
+  margin-bottom: 40px;
+  max-width: 250px;
+  
+  img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+}
+
+.spinner-ring {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 59, 48, 0.2);
+  border-radius: 50%;
+  border-top-color: #ff3b30;
+  animation: spin 1s linear infinite;
+  margin-bottom: 24px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loader-content h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1c1c1e;
+  margin: 0 0 12px 0;
+}
+
+.loader-content p {
+  font-size: 15px;
+  color: #8e8e93;
+  margin: 0;
+  line-height: 1.5;
+}
+

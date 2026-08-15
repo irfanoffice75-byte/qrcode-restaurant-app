@@ -1,0 +1,67 @@
+<ion-content>
+  <div class="welcome-container">
+
+    <!-- Top restaurant image — always shown -->
+    <div class="image-wrapper" [class.admin-image-wrapper]="isApp" *ngIf="!(isLoading && !isApp)">
+      <!-- Customer Web Image -->
+      <img *ngIf="!isApp" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop" alt="Delicious Food" class="welcome-img">
+      <!-- Admin App Image -->
+      <img *ngIf="isApp" src="assets/images/admin_banner.jpg" alt="Admin Dashboard" class="welcome-img">
+      <div class="gradient-overlay"></div>
+    </div>
+
+    <!-- Shown when user opens the page directly (no table QR code scanned) -->
+    <div class="content-section" *ngIf="!isLoading">
+      <!-- Customer Welcome -->
+      <ng-container *ngIf="!isApp">
+        <h1 class="title">Welcome!</h1>
+        <div class="qr-instruction-box">
+          <ion-icon name="qr-code-outline" class="qr-icon"></ion-icon>
+          <p class="instruction-text">Please scan the QR code available on your table to access the menu.</p>
+        </div>
+      </ng-container>
+
+      <!-- Admin Welcome -->
+      <ng-container *ngIf="isApp">
+        <div class="admin-badge">
+          <ion-icon name="restaurant-outline"></ion-icon>
+        </div>
+        
+        <h1 class="admin-title">
+          <span class="welcome-text">Welcome,</span>
+          <span class="admin-text">Admin</span>
+        </h1>
+        
+        <div class="admin-divider">
+          <div class="line"></div>
+          <ion-icon name="restaurant-outline" class="divider-icon"></ion-icon>
+          <div class="line"></div>
+        </div>
+
+        <p class="admin-subtitle">Manage orders and monitor<br>restaurant operations.</p>
+      </ng-container>
+      
+      <!-- Only shown in the APK -->
+      <div class="admin-login-container" *ngIf="isApp">
+        <button class="admin-action-btn" (click)="goToAdmin()">
+          <ion-icon name="lock-closed-outline" class="btn-icon-left"></ion-icon>
+          <span class="btn-text">Restaurant Kitchen Login</span>
+          <ion-icon name="chevron-forward-outline" class="btn-icon-right"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Shown while processing a QR scan -->
+    <div class="full-screen-loader" *ngIf="isLoading && !isApp">
+      <div class="loader-content">
+        <div class="illustration-wrapper">
+          <img src="assets/images/loading_illustration.jpg" alt="Preparing food">
+        </div>
+        <div class="spinner-ring"></div>
+        <h2>Loading Your Table</h2>
+        <p>We're preparing your menu.<br>Please wait a moment...</p>
+      </div>
+    </div>
+
+  </div>
+</ion-content>
