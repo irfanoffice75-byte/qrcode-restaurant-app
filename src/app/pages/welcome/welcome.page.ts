@@ -43,13 +43,6 @@ export class WelcomePage implements OnInit {
   }
 
   async handleTableScan(tableNumber: string) {
-    // Fast path: If we already have a saved active order, skip API latency and jump straight to tracking
-    const savedOrderId = localStorage.getItem('qr_current_order_id');
-    if (savedOrderId && !this.isApp) {
-      localStorage.setItem('qr_table_no', tableNumber);
-      this.router.navigate(['/order-tracking'], { replaceUrl: true });
-      return;
-    }
 
     let loading: any;
     if (this.isApp) {
