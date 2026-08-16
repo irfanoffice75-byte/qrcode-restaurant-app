@@ -68,7 +68,10 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
 
       // If we had active orders before and now all are paid/completed → show paid screen
       if (orders.length === 0 && !this.orderPaid) {
-        // Do nothing — let empty state show only when isInitializing is false
+        // If they had an order that completely disappeared (e.g., cancelled/deleted), auto-redirect
+        if (!this.isInitializing) {
+          this.startNewOrder();
+        }
       } else if (this.activeOrders.length === 0 && orders.length > 0) {
         this.orderPaid = true;
         this.isInitializing = false;
@@ -79,8 +82,13 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
     // Only turn off the spinner for an empty state AFTER the initial backend load is complete
     this.orderService.initialLoadComplete.subscribe(isComplete => {
       if (isComplete && this.activeOrders.length === 0) {
-        this.isInitializing = false;
-        this.cdr.detectChanges();
+        if (!this.orderPaid) {
+          // Automatically redirect to fresh menu if there are no active orders
+          this.startNewOrder();
+        } else {
+          this.isInitializing = false;
+          this.cdr.detectChanges();
+        }
       }
     });
   }

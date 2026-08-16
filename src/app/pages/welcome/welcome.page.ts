@@ -85,7 +85,7 @@ export class WelcomePage implements OnInit {
             this.orderService.loadExistingOrder(latestOrder);
 
             if (loading) await loading.dismiss();
-            this.isLoading = false;
+            // Keep isLoading true so it stays full-screen loading until navigation completes
             // Go to order-tracking so they see the live status of their order
             this.router.navigate(['/order-tracking'], { replaceUrl: true });
             return;
@@ -100,7 +100,6 @@ export class WelcomePage implements OnInit {
           }
 
           if (loading) await loading.dismiss();
-          this.isLoading = false;
           this.router.navigate(['/restaurant-home'], { replaceUrl: true });
           return;
         }
@@ -122,14 +121,12 @@ export class WelcomePage implements OnInit {
         }
         
         if (loading) await loading.dismiss();
-        this.isLoading = false;
         this.router.navigate(['/restaurant-home'], { replaceUrl: true });
         return;
       }
 
       // ── Truly brand-new customer (no UID, no saved name) ──────────────
       if (loading) await loading.dismiss();
-      this.isLoading = false;
       this.promptForNameAndEnter(tableNumber, tableId);
 
     } catch (err) {
@@ -203,7 +200,6 @@ export class WelcomePage implements OnInit {
       }
 
       if (loading) await loading.dismiss();
-      this.isLoading = false;
       this.router.navigate(['/restaurant-home'], { replaceUrl: true });
     } catch (err) {
       if (loading) await loading.dismiss();
