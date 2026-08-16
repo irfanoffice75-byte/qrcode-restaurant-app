@@ -171,6 +171,10 @@ export class OrderService {
           finalTotal: o.totalPrice
         })) as OrderHistory[];
         this.previousBills.next(bills);
+
+        if (!this.initialLoadComplete.getValue()) {
+          this.initialLoadComplete.next(true);
+        }
       });
     } catch (error) {
       console.error('Failed to refresh orders:', error);
