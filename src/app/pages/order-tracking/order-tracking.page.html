@@ -30,15 +30,26 @@
   </div>
 
   <!-- Loading spinner while waiting for first data -->
-  <div *ngIf="isInitializing" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 70vh;">
+  <div *ngIf="isLoading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 70vh;">
     <ion-spinner name="crescent" color="primary"></ion-spinner>
   </div>
 
-  <!-- Empty State (No Active Orders) has been completely removed to guarantee it never flashes. -->
-  <!-- The component logic now auto-redirects to the Menu if no orders exist. -->
+  <!-- Empty State (No Active Orders) shown ONLY after loading is finished and array is empty -->
+  <div class="empty-state-container" *ngIf="!isLoading && activeOrders.length === 0 && !orderPaid">
+    <div class="empty-icon-wrap">
+      <ion-icon name="restaurant-outline"></ion-icon>
+    </div>
+    <h2>No Active Orders</h2>
+    <p>You haven't ordered anything yet, or your past orders are fully complete.</p>
+    <ion-button expand="block" shape="round" color="danger" (click)="startNewOrder()" style="margin-top: 24px;">
+      <ion-icon name="menu-outline" slot="start"></ion-icon>
+      View Menu
+    </ion-button>
+  </div>
 
   <!-- Active orders only -->
-  <div class="tracking-container" *ngFor="let order of activeOrders; let i = index">
+  <ng-container *ngIf="!isLoading && activeOrders.length > 0">
+    <div class="tracking-container" *ngFor="let order of activeOrders; let i = index">
 
     <div class="order-label" *ngIf="activeOrders.length > 1">
       <ion-badge color="medium">Order {{ activeOrders.length - i }}</ion-badge>
@@ -100,10 +111,11 @@
 
     <hr *ngIf="i < activeOrders.length - 1" style="margin: 16px 0; border-color: #eee;" />
 
-  </div>
+    </div>
+  </ng-container>
 
   <!-- Action buttons -->
-  <div class="order-more-container" *ngIf="activeOrders.length > 0">
+  <div class="order-more-container" *ngIf="!isLoading && activeOrders.length > 0">
     <ion-button expand="block" shape="round" color="danger" fill="outline" (click)="goHome()">
       Order More Food
     </ion-button>

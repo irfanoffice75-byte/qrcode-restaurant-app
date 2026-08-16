@@ -16,7 +16,7 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
 
   // Only active (non-paid, non-completed) orders shown by default
   activeOrders: Order[] = [];
-  isInitializing = true;  // true until first data arrives — prevents empty state flash
+  isLoading = true;  // true until first data arrives — prevents empty state flash
   orderPaid = false;  // True when admin marks order as paid
   private ordersSub!: Subscription;
 
@@ -52,10 +52,10 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
       this.activeOrders = currentOrders.filter(
         o => o.status !== 'Paid' && o.status !== 'Completed'
       );
-      this.isInitializing = false;
+      this.isLoading = false;
     } else {
       // Always start with spinner ON if no data in memory
-      this.isInitializing = true;
+      this.isLoading = true;
     }
 
     this.ordersSub = this.orderService.myOrders$.subscribe(orders => {
@@ -67,18 +67,18 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
 
       // If active orders arrive, turn off spinner immediately
       if (this.activeOrders.length > 0) {
-        this.isInitializing = false;
+        this.isLoading = false;
       }
 
       // If we had active orders before and now all are paid/completed → show paid screen
       if (orders.length === 0 && !this.orderPaid) {
-        // If they had an order that completely disappeared (e.g., cancelled/deleted), auto-redirect
-        if (!this.isInitializing) {
-          this.startNewOrder();
+        // If they had an order that completely disappeared (e.g., cancelled/deleted), show empty state
+        if (!this.isLoading) {
+          // No auto-redirect here anymore, let the UI show empty state
         }
       } else if (this.activeOrders.length === 0 && orders.length > 0) {
         this.orderPaid = true;
-        this.isInitializing = false;
+        this.isLoading = false;
       }
       this.cdr.detectChanges();
     });
@@ -92,18 +92,9 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
     } catch (err) {
       this.orderService.sendTelemetry(`OrderTrackingPage: refreshAllOrders() failed -> ${err}`);
       console.error(err);
-    }
-
-    // After the backend load is complete, check if we still have no active orders
-    this.orderService.sendTelemetry(`OrderTrackingPage: Final check -> activeOrders count: ${this.activeOrders.length}`);
-    if (this.activeOrders.length === 0) {
-      if (!this.orderPaid) {
-        // Automatically redirect to fresh menu if there are genuinely no active orders
-        this.startNewOrder();
-      } else {
-        this.isInitializing = false;
-        this.cdr.detectChanges();
-      }
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
 
