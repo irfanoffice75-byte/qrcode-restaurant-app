@@ -7,6 +7,8 @@ import { environment } from '../environments/environment';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { OrderService } from './services/order.service';
+import { SwUpdate } from '@angular/service-worker';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -21,8 +23,19 @@ export class AppComponent implements OnInit {
     private router: Router,
     private toastController: ToastController,
     private orderService: OrderService,
-    private ngZone: NgZone
-  ) {}
+    private ngZone: NgZone,
+    private swUpdate: SwUpdate
+  ) {
+    // Check for PWA updates and reload instantly
+    if (this.swUpdate.isEnabled) {
+      this.swUpdate.versionUpdates.pipe(
+        filter(evt => evt.type === 'VERSION_READY')
+      ).subscribe(() => {
+        console.log('[PWA] New version ready. Reloading automatically...');
+        window.location.reload();
+      });
+    }
+  }
 
   async ngOnInit() {
     await this.authService.signInAnonymously();
