@@ -113,6 +113,18 @@ export class OrderService {
     this.refreshAllOrders();
   }
 
+  // Log to backend so agent can see frontend timeline
+  public sendTelemetry(message: string) {
+    const timestamp = new Date().toISOString();
+    const formatted = `[FRONTEND TIMELINE] ${timestamp} - ${message}`;
+    console.log(formatted);
+    fetch(`${this.apiUrl}/telemetry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: formatted })
+    }).catch(e => console.error('Telemetry failed', e));
+  }
+
   public async refreshAllOrders(): Promise<void> {
     try {
       const orders = await import('rxjs').then(m => m.firstValueFrom(this.http.get<Order[]>(`${this.apiUrl}/orders`)));
