@@ -42,7 +42,7 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     // ── Synchronous pre-check to prevent empty-state flash ──────────────
     const currentOrders = this.orderService.getMyOrders();
     if (currentOrders.length > 0) {
@@ -79,18 +79,24 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     });
 
-    // Only turn off the spinner for an empty state AFTER the initial backend load is complete
-    this.orderService.initialLoadComplete.subscribe(isComplete => {
-      if (isComplete && this.activeOrders.length === 0) {
-        if (!this.orderPaid) {
-          // Automatically redirect to fresh menu if there are no active orders
-          this.startNewOrder();
-        } else {
-          this.isInitializing = false;
-          this.cdr.detectChanges();
-        }
+    // Ensure we always fetch fresh data when the component mounts
+    // and wait for it to complete before executing any empty-state fallbacks
+    try {
+      await this.orderService.refreshAllOrders();
+    } catch (err) {
+      console.error(err);
+    }
+
+    // After the backend load is complete, check if we still have no active orders
+    if (this.activeOrders.length === 0) {
+      if (!this.orderPaid) {
+        // Automatically redirect to fresh menu if there are genuinely no active orders
+        this.startNewOrder();
+      } else {
+        this.isInitializing = false;
+        this.cdr.detectChanges();
       }
-    });
+    }
   }
 
   // Prevent browser back button from returning to the menu/cart
