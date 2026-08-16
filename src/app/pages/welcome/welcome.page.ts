@@ -62,11 +62,15 @@ export class WelcomePage implements OnInit {
         localStorage.setItem('qr_table_id', tableId);
       }
 
+      this.orderService.sendTelemetry(`WelcomePage: QR scan started for table ${tableNumber}`);
+
       // ── STEP 1: Get Anonymous UID ──────────────────────────────────────
       // signInAnonymously() always saves UID to localStorage.
       // getSavedUid() reads it back instantly even if Firebase is still loading.
       const authUser = await this.authService.signInAnonymously();
       const uid = authUser?.uid || this.authService.getSavedUid();
+      
+      this.orderService.sendTelemetry(`WelcomePage: UID retrieved -> ${uid}`);
 
       if (uid) {
         // ── STEP 2: Find latest order with this UID ────────────────────
@@ -80,6 +84,8 @@ export class WelcomePage implements OnInit {
           localStorage.setItem('qr_restaurant_name', 'The Grand Kitchen');
 
           if (!isPaid) {
+            this.orderService.sendTelemetry(`WelcomePage: Found ACTIVE latest order (${latestOrder.id}). Status: ${latestOrder.status}. Routing to /order-tracking.`);
+
             // ── Active order exists → restore it and show live status ────────
             localStorage.setItem('qr_current_order_id', latestOrder.id);
             this.orderService.loadExistingOrder(latestOrder);
@@ -90,6 +96,7 @@ export class WelcomePage implements OnInit {
             this.router.navigate(['/order-tracking'], { replaceUrl: true });
             return;
           } else {
+            this.orderService.sendTelemetry(`WelcomePage: Found PAID/COMPLETED latest order (${latestOrder.id}). Clearing session and routing to /restaurant-home.`);
             // ── Order is Paid → Returning customer, allow fresh order ──
             this.cartService.clearCart();
             localStorage.removeItem('qr_current_order_id');

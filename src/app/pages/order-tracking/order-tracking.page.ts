@@ -43,8 +43,10 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
   ) { }
 
   async ngOnInit() {
+    this.orderService.sendTelemetry(`OrderTrackingPage: ngOnInit started. Setting up state...`);
     // ── Synchronous pre-check to prevent empty-state flash ──────────────
     const currentOrders = this.orderService.getMyOrders();
+    this.orderService.sendTelemetry(`OrderTrackingPage: currentOrders from memory -> count: ${currentOrders.length}`);
     if (currentOrders.length > 0) {
       // Orders already in memory — render immediately, no flicker
       this.activeOrders = currentOrders.filter(
@@ -57,9 +59,11 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
     }
 
     this.ordersSub = this.orderService.myOrders$.subscribe(orders => {
+      this.orderService.sendTelemetry(`OrderTrackingPage: myOrders$ emitted -> count: ${orders.length}`);
       this.activeOrders = orders.filter(
         o => o.status !== 'Paid' && o.status !== 'Completed'
       );
+      this.orderService.sendTelemetry(`OrderTrackingPage: filtered activeOrders count -> ${this.activeOrders.length}`);
 
       // If active orders arrive, turn off spinner immediately
       if (this.activeOrders.length > 0) {
@@ -82,12 +86,16 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
     // Ensure we always fetch fresh data when the component mounts
     // and wait for it to complete before executing any empty-state fallbacks
     try {
+      this.orderService.sendTelemetry(`OrderTrackingPage: Awaiting refreshAllOrders()...`);
       await this.orderService.refreshAllOrders();
+      this.orderService.sendTelemetry(`OrderTrackingPage: refreshAllOrders() completed.`);
     } catch (err) {
+      this.orderService.sendTelemetry(`OrderTrackingPage: refreshAllOrders() failed -> ${err}`);
       console.error(err);
     }
 
     // After the backend load is complete, check if we still have no active orders
+    this.orderService.sendTelemetry(`OrderTrackingPage: Final check -> activeOrders count: ${this.activeOrders.length}`);
     if (this.activeOrders.length === 0) {
       if (!this.orderPaid) {
         // Automatically redirect to fresh menu if there are genuinely no active orders
