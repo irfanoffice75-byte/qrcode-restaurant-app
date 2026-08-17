@@ -68,6 +68,7 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
       // If active orders arrive, turn off spinner immediately
       if (this.activeOrders.length > 0) {
         this.isLoading = false;
+        this.orderService.sendTelemetry(`OrderTrackingPage: isLoading=false (from subscription - active orders found)`);
       }
 
       // If we had active orders before and now all are paid/completed → show paid screen
@@ -75,10 +76,15 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
         // If they had an order that completely disappeared (e.g., cancelled/deleted), show empty state
         if (!this.isLoading) {
           // No auto-redirect here anymore, let the UI show empty state
+        } else {
+           // It's the first empty load
+           this.isLoading = false;
+           this.orderService.sendTelemetry(`OrderTrackingPage: isLoading=false (from subscription - empty load)`);
         }
       } else if (this.activeOrders.length === 0 && orders.length > 0) {
         this.orderPaid = true;
         this.isLoading = false;
+        this.orderService.sendTelemetry(`OrderTrackingPage: isLoading=false (from subscription - paid state)`);
       }
       this.cdr.detectChanges();
     });
@@ -92,8 +98,9 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
     } catch (err) {
       this.orderService.sendTelemetry(`OrderTrackingPage: refreshAllOrders() failed -> ${err}`);
       console.error(err);
-    } finally {
       this.isLoading = false;
+      this.orderService.sendTelemetry(`OrderTrackingPage: isLoading=false (from error)`);
+    } finally {
       this.cdr.detectChanges();
     }
   }
