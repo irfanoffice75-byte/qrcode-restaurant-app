@@ -23,12 +23,6 @@ export class CartPage implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    const activeOrderId = localStorage.getItem('qr_current_order_id');
-    if (activeOrderId) {
-      this.router.navigate(['/order-tracking'], { replaceUrl: true });
-      return;
-    }
-
     this.cartSub = this.cartService.cartItems$.subscribe(items => {
       this.cartItems = items;
       this.totalPrice = this.cartService.getTotalPrice();

@@ -149,31 +149,27 @@ export class OrderService {
         const active = updatedOrders.filter(o => o.status !== 'Paid' && o.status !== 'Completed');
         this.allOrders.next(active);
 
-        // Restore currentOrder from localStorage if it's still active
+        // Merge orders based on customerId OR savedOrderId
         const savedOrderId = localStorage.getItem('qr_current_order_id');
-        if (savedOrderId) {
-          const found = active.find(o => o.id === savedOrderId);
-          if (found) {
-            this.currentOrder.next(found);
-            // Always keep myOrders in sync with the saved order
-            const currentMyOrders = this.myOrders.getValue();
-            const alreadyInMyOrders = currentMyOrders.some(o => o.id === found.id);
-            if (!alreadyInMyOrders) {
-              this.myOrders.next([found, ...currentMyOrders]);
-            } else {
-              this.myOrders.next(currentMyOrders.map(o => o.id === found.id ? found : o));
-            }
-          } else {
-            localStorage.removeItem('qr_current_order_id');
-            this.currentOrder.next(null);
-          }
+        const currentUserId = this.authService.getCurrentUserId();
+        
+        let myActive = active.filter(o => 
+          (currentUserId && o.customerId === currentUserId) || 
+          (savedOrderId && o.id === savedOrderId)
+        );
+        
+        // Remove duplicates if any
+        myActive = Array.from(new Map(myActive.map(item => [item.id, item])).values());
+        
+        this.myOrders.next(myActive);
+
+        if (myActive.length > 0) {
+          // Keep currentOrder as the latest one or the saved one
+          const current = savedOrderId ? myActive.find(o => o.id === savedOrderId) || myActive[0] : myActive[0];
+          this.currentOrder.next(current);
         } else {
-          // No saved order → fall back to filtering by userId
-          const currentUserId = this.authService.getCurrentUserId();
-          if (currentUserId) {
-            const myActive = active.filter(o => o.customerId === currentUserId);
-            this.myOrders.next(myActive);
-          }
+          this.currentOrder.next(null);
+          localStorage.removeItem('qr_current_order_id');
         }
 
         // Filter completed for the bills view

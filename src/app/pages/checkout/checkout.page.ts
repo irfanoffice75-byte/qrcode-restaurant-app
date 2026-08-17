@@ -30,12 +30,6 @@ export class CheckoutPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    const activeOrderId = localStorage.getItem('qr_current_order_id');
-    if (activeOrderId) {
-      this.router.navigate(['/order-tracking'], { replaceUrl: true });
-      return;
-    }
-
     this.cartItems = this.cartService.getCartItems();
     this.subtotal = this.cartService.getTotalPrice();
 
