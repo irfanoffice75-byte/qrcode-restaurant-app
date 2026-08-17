@@ -378,6 +378,16 @@ export class OrderService {
     }
   }
 
+  async getLatestOrderByTable(tableNumber: string): Promise<Order | null> {
+    try {
+      const order = await firstValueFrom(this.http.get<Order | null>(`${this.apiUrl}/orders/table/${tableNumber}/latest`));
+      return order;
+    } catch (err) {
+      console.error('Failed to get latest table order:', err);
+      return null;
+    }
+  }
+
   async getOrderHistoryByUid(uid: string): Promise<OrderHistory[]> {
     return [];
   }

@@ -73,37 +73,34 @@ export class WelcomePage implements OnInit {
       this.orderService.sendTelemetry(`WelcomePage: UID retrieved -> ${uid}`);
 
       if (uid) {
-        // ── STEP 2: Find latest order with this UID ────────────────────
-        const latestOrder = await this.orderService.getLatestOrderByUid(uid);
+        // ── STEP 2: Find latest active order for this Table ────────────────────
+        // The backend endpoint filters out Paid/Completed/Cancelled automatically
+        const latestOrder = await this.orderService.getLatestOrderByTable(tableNumber);
 
         if (latestOrder) {
-          const isPaid = latestOrder.status === 'Paid' || latestOrder.status === 'Completed';
-
           const customerName = latestOrder.customerName || localStorage.getItem('qr_customer_name') || 'Guest';
           localStorage.setItem('qr_customer_name', customerName);
           localStorage.setItem('qr_restaurant_name', 'The Grand Kitchen');
 
-          if (!isPaid) {
-            this.orderService.sendTelemetry(`WelcomePage: Found ACTIVE latest order (${latestOrder.id}). Status: ${latestOrder.status}. Routing to /order-tracking.`);
+          this.orderService.sendTelemetry(`WelcomePage: Found ACTIVE latest order (${latestOrder.id}). Status: ${latestOrder.status}. Routing to /order-tracking.`);
 
-            // ── Active order exists → restore it and show live status ────────
-            localStorage.setItem('qr_current_order_id', latestOrder.id);
-            this.orderService.loadExistingOrder(latestOrder);
+          // ── Active order exists → restore it and show live status ────────
+          localStorage.setItem('qr_current_order_id', latestOrder.id);
+          this.orderService.loadExistingOrder(latestOrder);
 
-            if (loading) await loading.dismiss();
-            // Keep isLoading true so it stays full-screen loading until navigation completes
-            // Go to order-tracking so they see the live status of their order
-            this.router.navigate(['/order-tracking'], { replaceUrl: true });
-            return;
-          } else {
-            this.orderService.sendTelemetry(`WelcomePage: Found PAID/COMPLETED latest order (${latestOrder.id}). Clearing session and routing to /restaurant-home.`);
-            // ── Order is Paid → Returning customer, allow fresh order ──
-            this.cartService.clearCart();
-            localStorage.removeItem('qr_current_order_id');
-            // We must clear the current order from the service so the UI doesn't show old state
-            if (this.orderService.clearCurrentOrder) {
-              this.orderService.clearCurrentOrder();
-            }
+          if (loading) await loading.dismiss();
+          // Keep isLoading true so it stays full-screen loading until navigation completes
+          // Go to order-tracking so they see the live status of their order
+          this.router.navigate(['/order-tracking'], { replaceUrl: true });
+          return;
+        } else {
+          this.orderService.sendTelemetry(`WelcomePage: No active orders found for table ${tableNumber}. Clearing session and routing to /restaurant-home.`);
+          // ── No active order → Returning customer or new, allow fresh order ──
+          this.cartService.clearCart();
+          localStorage.removeItem('qr_current_order_id');
+          // We must clear the current order from the service so the UI doesn't show old state
+          if (this.orderService.clearCurrentOrder) {
+            this.orderService.clearCurrentOrder();
           }
 
           if (loading) await loading.dismiss();
